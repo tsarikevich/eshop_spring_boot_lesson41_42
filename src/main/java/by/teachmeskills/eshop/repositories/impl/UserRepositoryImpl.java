@@ -32,12 +32,12 @@ public class UserRepositoryImpl implements UserRepository {
     public User create(User entity) {
         jdbcTemplate.update(INSERT_NEW_USER, entity.getLogin(), entity.getName(), entity.getSurname(),
                 entity.getPassword(), entity.getBirthDate(), entity.getEmail());
-        return getLastInsertUserFromBase();
+        return getLastInsertUserFromDB();
     }
 
     @Override
     public List<User> read() {
-        return jdbcTemplate.query(GET_ALL_USERS, (rs, rowNum) -> getResultSetUser(rs));
+        return jdbcTemplate.query(GET_ALL_USERS, (rs, rowNum) -> getUserFromResultSet(rs));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User getUserFromBaseByLoginAndPassword(User user) {
         return jdbcTemplate.query(GET_USER_BY_LOGIN_AND_PASSWORD,
-                        (rs, rowNum) -> getResultSetUser(rs), user.getLogin(), user.getPassword())
+                        (rs, rowNum) -> getUserFromResultSet(rs), user.getLogin(), user.getPassword())
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -62,7 +62,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User getUserFromBaseByLogin(User user) {
-        return jdbcTemplate.query(GET_USER_BY_LOGIN, (rs, rowNum) -> getResultSetUser(rs),
+        return jdbcTemplate.query(GET_USER_BY_LOGIN, (rs, rowNum) -> getUserFromResultSet(rs),
                 user.getLogin())
                 .stream()
                 .findAny()
@@ -72,7 +72,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User getUserById(int userId) {
         return jdbcTemplate.query(GET_USER_BY_ID,
-                (rs, rowNum) -> getResultSetUser(rs), userId)
+                (rs, rowNum) -> getUserFromResultSet(rs), userId)
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -84,15 +84,15 @@ public class UserRepositoryImpl implements UserRepository {
         return Optional.ofNullable(userFromBase).isPresent();
     }
 
-    private User getLastInsertUserFromBase() {
+    private User getLastInsertUserFromDB() {
         return jdbcTemplate.query(GET_LAST_INSERT_USER,
-                (rs, rowNum) -> getResultSetUser(rs))
+                (rs, rowNum) -> getUserFromResultSet(rs))
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private User getResultSetUser(ResultSet resultSet) throws SQLException {
+    private User getUserFromResultSet(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String login = resultSet.getString("login");
         String name = resultSet.getString("name");

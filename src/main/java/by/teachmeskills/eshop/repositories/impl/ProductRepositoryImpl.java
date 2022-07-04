@@ -39,7 +39,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public List<Product> read() {
-        return jdbcTemplate.query(GET_ALL_PRODUCTS, (rs, rowNum) -> getResultSetProduct(rs));
+        return jdbcTemplate.query(GET_ALL_PRODUCTS, (rs, rowNum) -> getProductFromResultSet(rs));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public Product getProductById(int productId) {
         return jdbcTemplate.query(GET_PRODUCT_BY_ID,
-                        (rs, rowNum) -> getResultSetProduct(rs), productId)
+                        (rs, rowNum) -> getProductFromResultSet(rs), productId)
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -65,7 +65,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public List<Product> getProductsByCategoryId(int categoryId) {
-        return jdbcTemplate.query(GET_PRODUCTS_BY_CATEGORY_ID, (rs, rowNum) -> getResultSetProduct(rs), categoryId);
+        return jdbcTemplate.query(GET_PRODUCTS_BY_CATEGORY_ID, (rs, rowNum) -> getProductFromResultSet(rs), categoryId);
     }
 
     @Override
@@ -82,12 +82,12 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findAllProductsByRequest(String request) {
         String setRequest = "%" + request + "%";
         return jdbcTemplate.query(FIND_ALL_PRODUCTS_BY_REQUEST,
-                (rs, rowNum) -> getResultSetProduct(rs), setRequest, setRequest);
+                (rs, rowNum) -> getProductFromResultSet(rs), setRequest, setRequest);
     }
 
     private Product getLastInsertProductFromBase() {
         return jdbcTemplate.query(GET_LAST_INSERT_PRODUCT,
-                        (rs, rowNum) -> getResultSetProduct(rs))
+                        (rs, rowNum) -> getProductFromResultSet(rs))
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -95,7 +95,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private Map<Product, Integer> getProductsWithNumbersById(int id, String request) {
         Map<Product, Integer> products = new HashMap<>();
-        List<Product> productList = jdbcTemplate.query(request,(rs, rowNum) -> getResultSetProduct(rs), id);
+        List<Product> productList = jdbcTemplate.query(request,(rs, rowNum) -> getProductFromResultSet(rs), id);
         List<Integer> numbersList = jdbcTemplate.query(request, (rs, rowNum) -> rs.getInt("numbers_product"),id);
         for (int i = 0; i < productList.size(); i++) {
             products.put(productList.get(i), numbersList.get(i));
@@ -103,7 +103,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         return products;
     }
 
-    private Product getResultSetProduct(ResultSet resultSet) throws SQLException {
+    private Product getProductFromResultSet(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String name = resultSet.getString("name");
         String description = resultSet.getString("description");

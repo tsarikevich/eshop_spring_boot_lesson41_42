@@ -45,7 +45,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> read() {
-        return jdbcTemplate.query(GET_ALL_ORDERS, (rs, rowNum) -> getResultSetOrderWithProducts(rs));
+        return jdbcTemplate.query(GET_ALL_ORDERS, (rs, rowNum) -> getOrderWithProductsFromResultSet(rs));
     }
 
     @Override
@@ -61,18 +61,18 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> getOrdersByUserId(int userId) {
-        return jdbcTemplate.query(GET_ORDERS_BY_USER_ID, (rs, rowNUm) -> getResultSetOrderWithProducts(rs), userId);
+        return jdbcTemplate.query(GET_ORDERS_BY_USER_ID, (rs, rowNUm) -> getOrderWithProductsFromResultSet(rs), userId);
     }
 
     private Order getOrderById(int orderId) {
         return jdbcTemplate.query(GET_ORDER_BY_ID,
-                        (rs, rowNUm) -> getResultSetOrderWithProducts(rs), orderId)
+                        (rs, rowNUm) -> getOrderWithProductsFromResultSet(rs), orderId)
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private Order getResultSetOrderWithProducts(ResultSet resultSet) throws SQLException {
+    private Order getOrderWithProductsFromResultSet(ResultSet resultSet) throws SQLException {
         int orderId = resultSet.getInt("id");
         BigDecimal price = resultSet.getBigDecimal("price");
         LocalDateTime date = resultSet.getObject("date", LocalDateTime.class);
@@ -89,13 +89,13 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private Order getLastInsertOrderByUserId(int userId) {
         return jdbcTemplate.query(GET_LAST_INSERT_ORDER_BY_USER_ID,
-                        (rs, rowNum) -> getResultSetOrder(rs), userId)
+                        (rs, rowNum) -> getOrderFromResultSet(rs), userId)
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private Order getResultSetOrder(ResultSet resultSet) throws SQLException {
+    private Order getOrderFromResultSet(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         BigDecimal price = resultSet.getBigDecimal("price");
         LocalDateTime date = resultSet.getObject("date", LocalDateTime.class);

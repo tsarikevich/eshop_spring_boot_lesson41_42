@@ -27,13 +27,7 @@ public class ProfileController {
 
     @GetMapping
     public ModelAndView getProfilePage(@SessionAttribute(USER) User user) {
-        if (Optional.ofNullable(user.getLogin()).isPresent()
-                && Optional.ofNullable(user.getPassword()).isPresent()
-                && Optional.ofNullable(user.getEmail()).isPresent()) {
-            return userService.showProfile(user);
-        } else {
-            return new ModelAndView(REDIRECT_TO_LOGIN_PAGE);
-        }
+        return userService.showProfile(user);
     }
 
     @GetMapping("/exit")

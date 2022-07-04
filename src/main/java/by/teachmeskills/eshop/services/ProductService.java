@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 public interface ProductService extends BaseService<Product> {
-    List<Product> getAllForCategory(int categoryId);
+    ModelAndView showSearchProductPage(User user);
 
     ModelAndView getProductData(User user, int id);
 

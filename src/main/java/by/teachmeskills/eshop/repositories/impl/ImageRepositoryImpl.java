@@ -34,12 +34,12 @@ public class ImageRepositoryImpl implements ImageRepository {
     public Image create(Image entity) {
         jdbcTemplate.update(INSERT_NEW_IMAGE, entity.getCategoryId(), entity.getProductId(),
                 entity.isPrimaryFlag(), entity.getImagePath());
-        return getLastInsertImageFromBase();
+        return getLastInsertImageFromDB();
     }
 
     @Override
     public List<Image> read() {
-        return jdbcTemplate.query(GET_ALL_IMAGES, (rs, rowNum) -> getResultSetImage(rs));
+        return jdbcTemplate.query(GET_ALL_IMAGES, (rs, rowNum) -> getImageFromResultSet(rs));
     }
 
     @Override
@@ -56,25 +56,25 @@ public class ImageRepositoryImpl implements ImageRepository {
 
     @Override
     public List<Image> getAllCategoriesImages() {
-        return jdbcTemplate.query(GET_ALL_CATEGORIES_IMAGES, (rs, rowNum) -> getResultSetImage(rs));
+        return jdbcTemplate.query(GET_ALL_CATEGORIES_IMAGES, (rs, rowNum) -> getImageFromResultSet(rs));
     }
 
     @Override
     public List<Image> getImagesByProductId(int productId) {
         return jdbcTemplate.query(GET_ALL_IMAGE_BY_PRODUCT_ID,
-                (rs, rowNum) -> getResultSetImage(rs), productId);
+                (rs, rowNum) -> getImageFromResultSet(rs), productId);
     }
 
     @Override
     public List<Image> getAllOrderPrimaryImagesByUserId(int userId) {
         return jdbcTemplate.query(GET_ALL_ORDER_PRIMARY_IMAGES_BY_USER_ID,
-                (rs, rowNum) -> getResultSetImage(rs), userId);
+                (rs, rowNum) -> getImageFromResultSet(rs), userId);
     }
 
     @Override
     public List<Image> getPrimaryImagesByCategoryId(int categoryId) {
         return jdbcTemplate.query(GET_PRIMARY_IMAGES_BY_CATEGORY_ID,
-                (rs, rowNum) -> getResultSetImage(rs), categoryId);
+                (rs, rowNum) -> getImageFromResultSet(rs), categoryId);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ImageRepositoryImpl implements ImageRepository {
         List<Image> images = new ArrayList<>();
         for (Product product : products) {
             images.add(jdbcTemplate.query(GET_PRIMARY_IMAGE_BY_PRODUCT_ID,
-                            (rs, rowNum) -> getResultSetImage(rs), product.getId())
+                            (rs, rowNum) -> getImageFromResultSet(rs), product.getId())
                     .stream()
                     .findAny()
                     .orElse(null));
@@ -92,21 +92,21 @@ public class ImageRepositoryImpl implements ImageRepository {
 
     private Image getImageById(int imageId) {
         return jdbcTemplate.query(GET_IMAGE_BY_ID,
-                        (rs, rowNum) -> getResultSetImage(rs), imageId)
+                        (rs, rowNum) -> getImageFromResultSet(rs), imageId)
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private Image getLastInsertImageFromBase() {
+    private Image getLastInsertImageFromDB() {
         return jdbcTemplate.query(GET_LAST_INSERT_IMAGE,
-                        (rs, rowNum) -> getResultSetImage(rs))
+                        (rs, rowNum) -> getImageFromResultSet(rs))
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private Image getResultSetImage(ResultSet rs) throws SQLException {
+    private Image getImageFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         int categoryId = rs.getInt("category_id");
         int productId = rs.getInt("product_id");

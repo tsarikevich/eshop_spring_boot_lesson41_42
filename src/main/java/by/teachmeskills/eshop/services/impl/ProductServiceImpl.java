@@ -16,6 +16,9 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Optional;
 
+import static by.teachmeskills.eshop.utils.EshopConstants.REDIRECT_TO_LOGIN_PAGE;
+import static by.teachmeskills.eshop.utils.PagesPathEnum.SEARCH_PAGE;
+
 @Service
 public class ProductServiceImpl implements ProductService {
     private ProductRepositoryImpl productRepository;
@@ -47,8 +50,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllForCategory(int categoryId) {
-        return null;
+    public ModelAndView showSearchProductPage(User user) {
+        if (Optional.ofNullable(user.getLogin()).isPresent()
+                && Optional.ofNullable(user.getPassword()).isPresent()
+                && Optional.ofNullable(user.getEmail()).isPresent()) {
+            return new ModelAndView(SEARCH_PAGE.getPath());
+        } else {
+            return new ModelAndView(REDIRECT_TO_LOGIN_PAGE);
+        }
     }
 
     @Override

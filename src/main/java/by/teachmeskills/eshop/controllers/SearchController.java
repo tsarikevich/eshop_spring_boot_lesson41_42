@@ -28,13 +28,7 @@ public class SearchController {
 
     @GetMapping
     public ModelAndView getSearchPage(@SessionAttribute(USER) User user) {
-        if (Optional.ofNullable(user.getLogin()).isPresent()
-                && Optional.ofNullable(user.getPassword()).isPresent()
-                && Optional.ofNullable(user.getEmail()).isPresent()) {
-            return new ModelAndView(SEARCH_PAGE.getPath());
-        } else {
-            return new ModelAndView(REDIRECT_TO_LOGIN_PAGE);
-        }
+        return productService.showSearchProductPage(user);
     }
 
     @PostMapping

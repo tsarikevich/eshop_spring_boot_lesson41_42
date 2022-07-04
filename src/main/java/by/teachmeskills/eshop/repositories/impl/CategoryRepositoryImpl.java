@@ -26,18 +26,18 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Category create(Category entity) {
         jdbcTemplate.update(INSERT_NEW_CATEGORY, entity.getName(), entity.getRating());
-        return getLastInsertCategoryFromBase();
+        return getLastInsertCategoryFromDB();
     }
 
     @Override
     public List<Category> read() {
-        return jdbcTemplate.query(GET_ALL_CATEGORIES, (rs, rowNum) -> getResultSetCategory(rs));
+        return jdbcTemplate.query(GET_ALL_CATEGORIES, (rs, rowNum) -> getCategoryFromResultSet(rs));
     }
 
     @Override
     public Category update(Category entity) {
         return jdbcTemplate.queryForObject(UPDATE_CATEGORY_BY_ID,
-                (rs, rowNum) -> getResultSetCategory(rs), entity.getName(), entity.getRating(), entity.getId());
+                (rs, rowNum) -> getCategoryFromResultSet(rs), entity.getName(), entity.getRating(), entity.getId());
     }
 
     @Override
@@ -45,9 +45,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         jdbcTemplate.update(DELETE_CATEGORY_BY_ID, id);
     }
 
-    private Category getLastInsertCategoryFromBase() {
+    private Category getLastInsertCategoryFromDB() {
         return jdbcTemplate.query(GET_LAST_INSERT_CATEGORY,
-                        (rs, rowNum) -> getResultSetCategory(rs))
+                        (rs, rowNum) -> getCategoryFromResultSet(rs))
                 .stream()
                 .findAny()
                 .orElse(null);
@@ -55,13 +55,13 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     private Category getCategoryById(int id) {
         return jdbcTemplate.query(GET_CATEGORY_BY_ID,
-                        (rs, rowNum) -> getResultSetCategory(rs), id)
+                        (rs, rowNum) -> getCategoryFromResultSet(rs), id)
                 .stream()
                 .findAny()
                 .orElse(null);
     }
 
-    private Category getResultSetCategory(ResultSet resultSet) throws SQLException {
+    private Category getCategoryFromResultSet(ResultSet resultSet) throws SQLException {
         int idFromBase = resultSet.getInt("id");
         String name = resultSet.getString("name");
         int rating = resultSet.getInt("rating");
